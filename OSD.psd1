@@ -4,27 +4,13 @@
 
 @{
     RootModule              = 'OSD.psm1'
-    NestedModules = @(
-                            '.\SubModules\Az.Clipboard',
-                            '.\SubModules\OSD.CloudMDT',
-                            '.\SubModules\OSD.CloudRE',
-                            '.\SubModules\OSD.CloudSecret',
-                            '.\SubModules\OSD.OOBE',
-                            '.\SubModules\OSD.WinPE',
-                            '.\SubModules\OSD.WinRE.WiFi',
-                            '.\SubModules\OSDCloud.DriverPack',
-                            '.\SubModules\OSDCloud.GUI',
-                            '.\SubModules\OSDCloud.Invoke',
-                            '.\SubModules\OSDCloud.Setup',
-                            '.\SubModules\OSDCloud.Start'
-    )
-    ModuleVersion           = '22.5.23.3'
+    ModuleVersion           = '22.6.17.1'
     CompatiblePSEditions    = @('Desktop')
     GUID                    = '9fe5b9b6-0224-4d87-9018-a8978529f6f5'
     Author                  = 'David Segura . Damien Van Robaeys . Gary Blok . Jérôme Bezet-Torres . Mike Marable . Dean Ellerby . Doug McGee'
     CompanyName             = 'OSD Community'
     Copyright               = '(c) 2022 OSD Community'
-    Description             = 'Edition - OSD PowerShell Module is a collection of functions and catalogs that make OSDCloud work'
+    Description             = 'OSDCloud Azure Edition - The OSD PowerShell Module is a collection of functions and catalogs that make OSDCloud work'
     PowerShellVersion       = '5.1'
     FormatsToProcess        = @(
         '.\Format\MsUpCat.Format.ps1xml'
@@ -142,9 +128,6 @@
         'Get-MyWindowsPackage',
         'Get-OSD',
         'Get-OSDClass',
-        'Get-OSDCloudREPSDrive',
-        'Get-OSDCloudREPartition',
-        'Get-OSDCloudREVolume',
         'Get-OSDCloudTemplate',
         'Get-OSDCloudWorkspace',
         'Get-OSDDriver',
@@ -175,7 +158,6 @@
         'Get-WSUSXML',
         'Get-WinREPartition',
         'Get-WinREWiFi',
-        'Hide-OSDCloudREDrive',
         'Install-SystemFirmwareUpdate',
         'Invoke-Exe',
         'Invoke-MSCatalogParseDate',
@@ -193,7 +175,6 @@
         'New-CAB',
         'New-CabDevelopment',
         'New-OSDCloudISO',
-        'New-OSDCloudREVolume',
         'New-OSDCloudTemplate',
         'New-OSDCloudUSB',
         'New-OSDCloudWorkspace',
@@ -232,7 +213,6 @@
         'Set-BootmgrTimeout',
         'Set-ClipboardScreenshot',
         'Set-DisRes',
-        'Set-OSDCloudREBootmgr',
         'Set-OSDCloudUnattendAuditMode',
         'Set-OSDCloudUnattendAuditModeAutopilot',
         'Set-OSDCloudUnattendSpecialize',
@@ -242,12 +222,12 @@
         'Set-WinREWiFi',
         'Set-WindowsImageExecutionPolicy',
         'Show-MsSettings',
-        'Show-OSDCloudREDrive',
         'Show-RegistryXML',
         'Start-DiskImageGUI',
         'Start-OOBEDeploy',
         'Start-OSDCloud',
         'Start-OSDCloudGUI',
+        'Start-OSDCloudGUIDev',
         'Start-OSDPad',
         'Start-OSDeployPad',
         'Start-ScreenPNGProcess',
@@ -276,11 +256,12 @@
         'Get-CloudSecret',
         'Set-CloudSecret',
         'Invoke-CloudSecret',
-        'Start-AzOSDCloudGUI',
+        'Start-OSDCloudAzure',
         'Test-MicrosoftUpdateCatalog',
         'Initialize-OSDCloudStartnet',
         'Get-AzClipboard',
-        'Set-AzClipboard'
+        'Set-AzClipboard',
+        'Start-OSDCloudREAzure'
     )
     CmdletsToExport = @()
     VariablesToExport = @()
