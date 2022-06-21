@@ -44,6 +44,7 @@ function Start-OSDPad {
     #   GitHub
     #================================================
     if ($PSCmdlet.ParameterSetName -eq 'GitHub') {
+        $RepoType = "GitHub"
         $Uri = "https://api.github.com/repos/$RepoOwner/$RepoName/contents/$RepoFolder"
         Write-Host -ForegroundColor DarkCyan $Uri
 
@@ -125,7 +126,7 @@ function Start-OSDPad {
                 }
         
                 $ObjectProperties = @{
-                    RepoType   = 'GitHub'
+                    RepoType        = $RepoType
                     RepoOwner       = $RepoOwner
                     RepoName        = $RepoName
                     RepoFolder      = $RepoFolder
@@ -151,7 +152,8 @@ function Start-OSDPad {
     #================================================
     #   GitLab
     #================================================
-    elseif ($PSCmdlet.ParameterSetName -eq ('GitLab')) {    
+    elseif ($PSCmdlet.ParameterSetName -eq 'GitLab') {        
+        $RepoType = "GitLab"
         $RestAPI = "api/v4/projects/$RepoName/repository/tree?path=$RepoFolder&recursive=true"
         $Uri = "https://$RepoDomain/$RestAPI"       
         Write-Host -ForegroundColor DarkCyan $Uri
@@ -226,7 +228,7 @@ function Start-OSDPad {
                 }
         
                 $ObjectProperties = @{
-                    RepoType   = 'GitLab'
+                    RepoType   = $RepoType
                     RepoDomain = $RepoDomain
                     #RepoOwner  = $RepoOwner
                     RepoName   = $RepoName
