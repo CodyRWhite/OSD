@@ -1,4 +1,4 @@
-﻿function Start-OSDPad {
+function Start-OSDPad {
     [CmdletBinding(DefaultParameterSetName = 'Standalone')]
     param (
         [Parameter(ParameterSetName = 'GitHub', Mandatory = $true, Position = 0)]
@@ -6,7 +6,7 @@
         [string]$RepoOwner,
         
         [Parameter(ParameterSetName = 'GitHub', Mandatory = $true, Position = 1)]
-        [Parameter(ParameterSetName = 'GitLab', Mandatory = $true, Position = 0)]        
+        [Parameter(ParameterSetName = 'GitLab', Mandatory = $true, Position = 0)] 
         [Alias('Repository','GitRepo')]
         [string]$RepoName,
         
@@ -15,12 +15,21 @@
         [Alias('GitPath','Folder')]
         [string]$RepoFolder,
         
-        [Parameter(ParameterSetName = 'GitLab', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'GitLab', Mandatory = $true)] 
         [Alias('GitLabUri')]
         [string]$RepoDomain,
 
+        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 0)]  
+        [Alias('DevOpsProject')]
+        [string]$Project,        
+
+        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 1)]  
+        [Alias('DevOpsOrganization')]
+        [string]$Organization,
+
         [Parameter(ParameterSetName = 'GitHub')]
         [Parameter(ParameterSetName = 'GitLab')]
+        [Parameter(ParameterSetName = 'DevOps')]
         [Alias('OAuthToken')]
         [string]$OAuth,
 
@@ -248,6 +257,109 @@
                     #SHA        = $Item.sha
                     #Git        = $Item.git_url
                     #Download   = $Item.download_url
+                    ContentRAW = $ScriptWebRequest
+                    #NodeId         = $FileContent.node_id
+                    #Content        = $FileContent.content
+                    #Encoding       = $FileContent.encoding
+                }
+                New-Object -TypeName PSObject -Property $ObjectProperties
+            }
+        }
+        $Global:OSDPad = $Results
+    }
+    #================================================
+    #   Azure DevOps
+    #================================================
+    elseif ($PSCmdlet.ParameterSetName -eq 'DevOps') {         
+        $RepoType = "DevOps"
+        $RestAPI = "_apis/git/repositories/$RepoName/items?scopePath=$RepoFolder&recursionLevel=Full&includeContentMetadata=true"
+        $Uri = "https://dev.azure.com/$RepoOrganization/$RepoProject/$RestAPI"       
+        Write-Host -ForegroundColor DarkCyan $Uri
+
+        $Params = @{
+            Uri             = $uri
+            Method          = "GET"
+            ContentType     = "application/json"            
+            UseBasicParsing = $true
+        }
+        IF ($OAuth) { 
+            $token = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes(":$OAuth"))
+            $Params.add("Headers", @{Authorization = "Basic $token" }) 
+        }  
+        
+        $DevOpsApiContent = @()
+        try {
+            $DevOpsApiContent = Invoke-RestMethod @Params -ErrorAction Stop
+        }
+        catch {
+            Write-Warning $_
+            Break
+        }      
+
+        $DevOpsApiContent = $DevOpsApiContent.value | Where-Object { ($_.path -like "*.md") -or ($_.path -like "*.ps1") }
+        
+        Write-Host -ForegroundColor DarkGray "========================================================================="
+        $Results = foreach ($Item in $DevOpsApiContent) {
+            #$FileContent = Invoke-RestMethod -UseBasicParsing -Uri $Item.git_url
+            if ($Item.gitObjectType -eq 'tree') {
+                Write-Host -ForegroundColor DarkCyan "Directory: Start-OSDPad $RepoDomain $RepoName $($Item.name)"
+                
+                $ObjectProperties = @{
+                    RepoOwner  = $RepoOwner
+                    RepoName   = $RepoName
+                    RepoFolder = $RepoFolder
+                    Name       = $Item.name
+                    Type       = $Item.type
+                    Guid       = New-Guid
+                    Path       = $Item.path
+                    Size       = $Item.size
+                    SHA        = $Item.sha
+                    Git        = $Item.git_url
+                    Download   = $Item.download_url
+                    ContentRAW = $null
+                    #NodeId         = $FileContent.node_id
+                    #Content        = $FileContent.content
+                    #Encoding       = $FileContent.encoding
+                }
+                #New-Object -TypeName PSObject -Property $ObjectProperties
+            }
+            else {
+                $Uri = $Item.url
+                Write-Host -ForegroundColor DarkGray $Uri
+                
+                $Params = @{
+                    Uri         = $Uri
+                    Method      = "GET"
+                    ContentType = "application/json"
+                }
+                IF ($OAuth) { 
+                    $token = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes(":$OAuth"))
+                    $Params.add("Headers", @{Authorization = "Basic $token" }) 
+                }            
+
+                try {
+                    $ScriptWebRequest = Invoke-RestMethod @Params -ErrorAction Ignore
+                }
+                catch {
+                    Write-Warning $_
+                    $ScriptWebRequest = $null
+                    Continue
+                }
+        
+                $ObjectProperties = @{
+                    RepoType   = $RepoType
+                    RepoDomain = $RepoDomain
+                    #RepoOwner  = $RepoOwner
+                    RepoName   = $RepoName
+                    RepoFolder = $RepoFolder
+                    Name       = $Item.path.split("/")[-1]
+                    Type       = $Item.gitObjectType
+                    Guid       = $Item.objectId
+                    Path       = $Item.path
+                    #Size       = $Item.size
+                    #SHA        = $Item.sha
+                    #Git        = $Item.git_url
+                    Download   = $Item.url
                     ContentRAW = $ScriptWebRequest
                     #NodeId         = $FileContent.node_id
                     #Content        = $FileContent.content
