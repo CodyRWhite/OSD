@@ -7,11 +7,13 @@ function Start-OSDPad {
         
         [Parameter(ParameterSetName = 'GitHub', Mandatory = $true, Position = 1)]
         [Parameter(ParameterSetName = 'GitLab', Mandatory = $true, Position = 0)] 
+        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 2)] 
         [Alias('Repository','GitRepo')]
         [string]$RepoName,
         
         [Parameter(ParameterSetName = 'GitHub', Position = 2)]
         [Parameter(ParameterSetName = 'GitLab', Position = 1)]
+        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 3)]  
         [Alias('GitPath','Folder')]
         [string]$RepoFolder,
         
@@ -19,11 +21,11 @@ function Start-OSDPad {
         [Alias('GitLabUri')]
         [string]$RepoDomain,
 
-        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 0)]  
+        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 1)]  
         [Alias('DevOpsProject')]
         [string]$Project,        
 
-        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 1)]  
+        [Parameter(ParameterSetName = 'DevOps', Mandatory = $true, Position = 0)]  
         [Alias('DevOpsOrganization')]
         [string]$Organization,
 
@@ -273,7 +275,7 @@ function Start-OSDPad {
     elseif ($PSCmdlet.ParameterSetName -eq 'DevOps') {         
         $RepoType = "DevOps"
         $RestAPI = "_apis/git/repositories/$RepoName/items?scopePath=$RepoFolder&recursionLevel=Full&includeContentMetadata=true"
-        $Uri = "https://dev.azure.com/$RepoOrganization/$RepoProject/$RestAPI"       
+        $Uri = "https://dev.azure.com/$Organization/$Project/$RestAPI"       
         Write-Host -ForegroundColor DarkCyan $Uri
 
         $Params = @{
